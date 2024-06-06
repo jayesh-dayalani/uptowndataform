@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- code here -->
+      <div class="card">
+        <div class="card-image">
+          <h2 class="card-heading"></h2>
+        </div>
+        <form class="card-form">
+          <div class="input">
+            <input
+              type="text"
+              id="name"
+              class="input-field"
+              value=""
+              required
+            />
+            <label class="input-label">Full name</label>
+          </div>
+          <div class="input">
+            <input
+              type="date"
+              id="dob"
+              class="input-field"
+              value="2024-02-12"
+              required
+            />
+            <label class="input-label">Birth Date</label>
+          </div>
+          <div class="input">
+            <input type="number" id="num" class="input-field" required />
+            <label class="input-label">Phone Number</label>
+          </div>
+          <div class="action">
+            <button class="action-button" id="submit">Submit</button>
+          </div>
+        </form>
+        <div class="card-info">
+          <p>
+            By signing up you are agreeing to our
+            <a href="#">Terms and Conditions</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      get,
+      child,
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAr_e6tSKTx3kUaTt4VSW-Yl9MB8jAd0CI",
+      authDomain: "uptown-e18f2.firebaseapp.com",
+      projectId: "uptown-e18f2",
+      storageBucket: "uptown-e18f2.appspot.com",
+      messagingSenderId: "215634717165",
+      appId: "1:215634717165:web:3cad47469b0fed4b96dfe4",
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    const db = getDatabase(app);
+
+    document.getElementById("submit").addEventListener("click", function (e) {
+      e.preventDefault();
+      set(ref(db, "user/" + document.getElementById("name").value), {
+        username: document.getElementById("name").value,
+        dob: document.getElementById("dob").value,
+        num: document.getElementById("num").value,
+      });
+
+      setTimeout(() => {
+        window.location = "./card.html";
+        
+      }, 2000);
+      // alert("Login success")
+    });
+  </script>
+</html>

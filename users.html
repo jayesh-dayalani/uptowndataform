@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Users</title>
+    <style>
+      /* Style for the title */
+      h1 {
+        font-size: 2rem;
+        text-align: center;
+      }
+
+      /* Style for the table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+      }
+      th,
+      td {
+        padding: 8px;
+
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+
+      .table-div {
+        margin: 0 10%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Users</h1>
+    <div style="overflow-x: auto" class="table-div">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Number</th>
+            <th class="birth">Birth Date</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody"></tbody>
+      </table>
+    </div>
+  </body>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import {
+      getDatabase,
+      onValue,
+      ref,
+      set,
+      get,
+      child,
+    } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAr_e6tSKTx3kUaTt4VSW-Yl9MB8jAd0CI",
+      authDomain: "uptown-e18f2.firebaseapp.com",
+      projectId: "uptown-e18f2",
+      storageBucket: "uptown-e18f2.appspot.com",
+      messagingSenderId: "215634717165",
+      appId: "1:215634717165:web:3cad47469b0fed4b96dfe4",
+    };
+
+    let sorted = false;
+
+    let users = [];
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    const db = getDatabase(app);
+    let tr;
+    let allUsers = [];
+    function getUsers() {
+      const usersRef = ref(db, "user");
+
+      // Listen for changes to the users node
+
+      onValue(usersRef, (snapshot) => {
+        users = snapshot.val();
+        if (users) {
+          // Loop through each user and log their details
+          Object.keys(users).forEach((userId) => {
+            const user = users[userId];
+            tr = document.createElement("tr");
+            tr.innerHTML = `
+      <td>${user.username}</td>
+      <td>${user.num}</td>
+      <td>${user.dob.split("-")[2] + "-" + user.dob.split("-")[1]}</td>
+    `;
+            document.querySelector("tbody").append(tr);
+          });
+        } else {
+          console.log("No users found");
+        }
+      });
+    }
+
+    document.querySelector(".birth").addEventListener("click", () => {
+      // let justNames = Object.keys(users);
+      let data = users;
+      Object.keys(users).forEach((i) => (users[i].dob = users[i].dob.slice(5)));
+
+      const sortedData = Object.values(data).sort((a, b) => {
+        const [aMonth, aDay] = a.dob.split("-").map(Number);
+        const [bMonth, bDay] = b.dob.split("-").map(Number);
+
+        if (aMonth !== bMonth) {
+          return aMonth - bMonth;
+        } else {
+          return aDay - bDay;
+        }
+      });
+
+      console.log(sortedData);
+
+      let todyDate = new Date().getDate();
+      let todayMonth = new Date().getMonth() + 1;
+
+      if (sorted) {
+        return;
+        document.querySelector("tbody").innerHTML = "";
+        console.log("data");
+        console.log(users);
+        data.forEach((user) => {
+          tr = document.createElement("tr");
+          tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.num}</td>
+                <td>${
+                  user.dob.split("-")[1] + "-" + user.dob.split("-")[0]
+                }</td>
+              `;
+          document.querySelector("tbody").append(tr);
+        });
+        sorted = false;
+        return;
+      } else {
+        for (let i = 0; i < sortedData.length; i++) {
+          if (sortedData[i].dob.split("-")[0] >= todayMonth) {
+            if (sortedData[i].dob.split("-")[1] >= todyDate) {
+              let newArr = sortedData.slice(i).concat(sortedData.slice(0, i));
+
+              console.log(sorted);
+              document.querySelector("tbody").innerHTML = "";
+              newArr.forEach((user) => {
+                tr = document.createElement("tr");
+                tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.num}</td>
+                <td>${
+                  user.dob.split("-")[1] + "-" + user.dob.split("-")[0]
+                }</td>
+              `;
+                document.querySelector("tbody").append(tr);
+              });
+              sorted = true;
+              return;
+            }
+          }
+        }
+        sorted = true;
+      }
+    });
+
+    setTimeout(() => {
+      getUsers();
+    }, 500);
+  </script>
+</html>
